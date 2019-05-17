@@ -1,0 +1,170 @@
+import pandas as pd
+from selenium import webdriver
+from selenium.common import exceptions
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+import datetime
+import time
+import math
+import os
+import sys
+from bs4 import BeautifulSoup as soup
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
+
+timeout = 3 #Seconds
+timer_per_page = 3
+
+
+
+def startAndEndTime(teamofInterest, yearofInterest):
+    '''
+    user inputs the desired team and year of interest, then the program looks through an external csv file
+    with the NBA schedule and searches for the start and end date, then it converts it into a form that is
+    website friendly.
+    '''
+    NBAschedule = "NBAschedule.csv"
+    reviews = pd.read_csv(NBAschedule)
+    firstRow = list(reviews.columns)
+    for index in range(1,len(firstRow)):
+        if str(yearofInterest) == firstRow[index]:
+            desiredIndex = index
+    startDate = reviews.iloc[0, desiredIndex]
+    startDate = str(startDate)
+    endDate = reviews.iloc[1, desiredIndex]
+    date_1 = datetime.datetime.strptime(startDate, "%m/%d/%y")
+    date_end = datetime.datetime.strptime(endDate, "%m/%d/%y")
+    # date_1 = datetime.datetime(2015, 11, 27, 0, 0)
+    return date_1, date_end
+
+
+
+def webScraping(teamofInterest, yearofInterest, date_1, date_end):
+    """
+    With the start and end date of a specific season, the program can now begin scraping. It first creates
+    the url of the first day of the season, looks through the page in search of the input team. If the team
+    of interest wasn't playing that day, then it iterates to the next day. But if the team was playing, then
+    it searches for the button that leads to the play by play data, clicks into it, and saves the play by play
+    data into a csv file; then it iterates to the next day. It does this for the remainder of the season.
+    (In a normal season, most teams play 82 games. However, there are exceptions. Sometimes a team might miss
+    games due to unforseen events like weather, strikes, and the NBA lockdown.)
+    """
+    team_counter = 0
+    # launch chrome
+    driver = webdriver.Chrome()
+    # generate website address
+    while str(date_1) != str(date_end):
+        start = time.time()
+        print(date_1)
+        year = str(date_1.year)
+        month = str(date_1.month)
+        day = str(date_1.day)
+        if len(day) == 1 or len(month) == 1:
+            month = month.zfill(2)
+            day = day.zfill(2)
+        date_polished = year + month + day 
+        scoreboardAddress = "http://scores.espn.com/nba/scoreboard/_/date/" + date_polished
+        print("scoreboardAddress", scoreboardAddress)
+        # if scoreboardAddress = "https://privacy.thewaltdisneycompany.com/en/current-privacy-policy/cookies-policy/"
+        driver.get(scoreboardAddress)
+        time.sleep(timer_per_page)
+        try:
+            WebDriverWait(driver, timeout).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "scoreboard")))
+        except exceptions.TimeoutException:
+            print("Timed out waiting for scoreboard loading")
+            continue
+        # looking for team of interest
+        teams_playing = driver.find_elements_by_class_name("sb-team-short")
+        counter = len(teams_playing)
+        for count in range(0, counter):
+            print(teams_playing[count].text)
+            if teams_playing[count].text == teamofInterest:
+                print("found a match")
+                index = int(count/2)
+                play_by_play = 3 * index + 2
+                playByPlayBtn = driver.find_elements_by_class_name("button-alt")[play_by_play]
+                team_counter +=1
+                print(scoreboardAddress)
+                print("team counter", team_counter)
+                # time.sleep(timer_per_page)
+                # getting playbyplay
+                newAddress = playByPlayBtn.get_attribute("href")
+                
+                print("newAddress", newAddress)
+                gameID = newAddress.split('=')[1]
+                # time.sleep(timer_per_page)
+                playbyplayAddress = "http://www.espn.com/nba/playbyplay?gameId=" + gameID
+                driver.close()
+                driver = webdriver.Chrome()
+                driver.get(playbyplayAddress)
+                time.sleep(timer_per_page)
+                try:
+                    WebDriverWait(driver, timeout).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "main-content")))
+                except exceptions.TimeoutException:
+                    print("Timed out waiting for play-by-play loading")
+                    continue
+                html = driver.page_source
+                # time.sleep(timer_per_page)
+                page_soup = soup(html, "lxml")
+                actions = []
+                title = teamofInterest + " " + str(yearofInterest)
+                print("date", date_polished)
+
+                # saving into csv
+                fileName = teamofInterest + " " + date_polished + " " + str(team_counter) + ".csv"
+                print("filename", fileName)
+                fileAddress = teamofInterest + "/" + title + "/" + fileName
+                f = open(fileAddress, "w")
+                headers = "quarter, time remaining, action " + str(date_polished) + ",score\n"
+                f.write(headers)
+                for counter in range(1,5):
+                    x = "gp-quarter-" + str(counter)
+                    quarterData = page_soup.findAll("div", {"id":x})
+                    for quarter in quarterData:
+                        information = quarter.findAll('tr')
+                        for info in information[1:]:
+                            timeStamp = info.findAll('td', {"class":"time-stamp"})
+                            timeStamp = timeStamp[0].text
+                            action = info.findAll('td', {"class":"game-details"})
+                            action = action[0].text
+                            score = info.findAll('td', {"class":"combined-score"})
+                            score = score[0].text
+                            f.write(str(counter) + "," +  timeStamp + "," +  action.encode('utf-8') + "," +  score + "\n")
+                        counter += 1
+                f.close()
+                break
+        date_1 = date_1 + datetime.timedelta(days=1)
+        end = time.time()
+        print("seconds", end-start)
+    driver.close()
+
+
+def latest_game(team, year):
+    game_dir = team + "/" + team + "_" + str(year)
+    # Open a file
+    path = os.path.join("/Users/weixunhe/Desktop/classes/NBA/webscraping/data/scrapingProgress/", game_dir)
+    # print path
+    files = os.listdir( path )
+
+    if not files:
+        print "nothing"
+        return None
+    else:
+        most_recent_file = max(files)
+        print most_recent_file
+        date = most_recent_file.split('_')[1]
+        date = date.split('.')[0]
+        date = datetime.datetime(year=int(date[0:4]), month=int(date[4:6]), day=int(date[6:8]))
+        print date
+        return date
+     
+
+# navigate to the directory of your file
+
+inputTeam = "Bulls"
+startingYear = 2013
+for current_year in range(startingYear,2015+1):
+    date1, date2 = startAndEndTime(inputTeam, current_year)
+    webScraping(inputTeam, current_year, date1, date2)
