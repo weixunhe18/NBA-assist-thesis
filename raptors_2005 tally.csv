@@ -1,0 +1,82 @@
+passer,receiver,assist
+Mike James,Mike James,0
+Mike James,Jose Calderon,6
+Mike James,Morris Peterson,93
+Mike James,Chris Bosh,83
+Mike James,Charlie Villanueva,54
+Mike James,Jalen Rose,15
+Mike James,Darrick Martin,5
+Mike James,Joey Graham,24
+Mike James,Other,66
+Jose Calderon,Mike James,12
+Jose Calderon,Jose Calderon,0
+Jose Calderon,Morris Peterson,37
+Jose Calderon,Chris Bosh,25
+Jose Calderon,Charlie Villanueva,33
+Jose Calderon,Jalen Rose,7
+Jose Calderon,Darrick Martin,0
+Jose Calderon,Joey Graham,18
+Jose Calderon,Other,37
+Morris Peterson,Mike James,19
+Morris Peterson,Jose Calderon,3
+Morris Peterson,Morris Peterson,0
+Morris Peterson,Chris Bosh,33
+Morris Peterson,Charlie Villanueva,31
+Morris Peterson,Jalen Rose,11
+Morris Peterson,Darrick Martin,1
+Morris Peterson,Joey Graham,19
+Morris Peterson,Other,32
+Chris Bosh,Mike James,27
+Chris Bosh,Jose Calderon,5
+Chris Bosh,Morris Peterson,26
+Chris Bosh,Chris Bosh,0
+Chris Bosh,Charlie Villanueva,31
+Chris Bosh,Jalen Rose,2
+Chris Bosh,Darrick Martin,2
+Chris Bosh,Joey Graham,7
+Chris Bosh,Other,24
+Charlie Villanueva,Mike James,9
+Charlie Villanueva,Jose Calderon,3
+Charlie Villanueva,Morris Peterson,14
+Charlie Villanueva,Chris Bosh,11
+Charlie Villanueva,Charlie Villanueva,0
+Charlie Villanueva,Jalen Rose,6
+Charlie Villanueva,Darrick Martin,0
+Charlie Villanueva,Joey Graham,8
+Charlie Villanueva,Other,13
+Jalen Rose,Mike James,13
+Jalen Rose,Jose Calderon,4
+Jalen Rose,Morris Peterson,9
+Jalen Rose,Chris Bosh,9
+Jalen Rose,Charlie Villanueva,13
+Jalen Rose,Jalen Rose,0
+Jalen Rose,Darrick Martin,0
+Jalen Rose,Joey Graham,1
+Jalen Rose,Other,4
+Darrick Martin,Mike James,2
+Darrick Martin,Jose Calderon,0
+Darrick Martin,Morris Peterson,11
+Darrick Martin,Chris Bosh,9
+Darrick Martin,Charlie Villanueva,8
+Darrick Martin,Jalen Rose,4
+Darrick Martin,Darrick Martin,0
+Darrick Martin,Joey Graham,5
+Darrick Martin,Other,7
+Joey Graham,Mike James,7
+Joey Graham,Jose Calderon,0
+Joey Graham,Morris Peterson,19
+Joey Graham,Chris Bosh,6
+Joey Graham,Charlie Villanueva,5
+Joey Graham,Jalen Rose,0
+Joey Graham,Darrick Martin,0
+Joey Graham,Joey Graham,0
+Joey Graham,Other,7
+Other,Mike James,16
+Other,Jose Calderon,0
+Other,Morris Peterson,25
+Other,Chris Bosh,10
+Other,Charlie Villanueva,21
+Other,Jalen Rose,8
+Other,Darrick Martin,1
+Other,Joey Graham,12
+Other,Other,21
